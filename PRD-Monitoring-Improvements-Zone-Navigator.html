@@ -1,0 +1,784 @@
+g<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRD: Monitoring Improvements for Zone Navigator – SaaS Filter and Flow Health Tiles</title>
+    <style>
+        :root {
+            --primary: #0052CC;
+            --primary-light: #DEEBFF;
+            --secondary: #172B4D;
+            --text: #333;
+            --text-light: #6B778C;
+            --border: #DFE1E6;
+            --bg: #FAFBFC;
+            --white: #FFFFFF;
+            --red: #DE350B;
+            --yellow: #FF991F;
+            --green: #00875A;
+            --purple: #5243AA;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+            background: var(--bg);
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        /* Header */
+        .doc-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+            color: var(--white);
+            padding: 48px 40px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+        }
+
+        .doc-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .doc-header .subtitle {
+            font-size: 15px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .meta-badges {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* Priority Banner */
+        .priority-banner {
+            background: var(--primary-light);
+            border-left: 4px solid var(--primary);
+            padding: 16px 20px;
+            border-radius: 4px;
+            margin-bottom: 32px;
+            font-size: 14px;
+        }
+
+        .priority-banner strong {
+            color: var(--primary);
+        }
+
+        /* Sections */
+        .section {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+
+        .section h2 {
+            font-size: 22px;
+            color: var(--secondary);
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .section h3 {
+            font-size: 17px;
+            color: var(--secondary);
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .section h4 {
+            font-size: 15px;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+
+        .section p {
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .section ul, .section ol {
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }
+
+        .section li {
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+
+        /* Table */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: var(--primary);
+            color: var(--white);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:nth-child(even) {
+            background: var(--bg);
+        }
+
+        tr:last-child td {
+            font-weight: 600;
+            background: var(--primary-light);
+        }
+
+        /* Feature Cards */
+        .feature-card {
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 24px;
+            margin: 16px 0;
+            background: var(--white);
+        }
+
+        .feature-card.secondary {
+            border-color: var(--purple);
+        }
+
+        .feature-card .feature-label {
+            display: inline-block;
+            background: var(--primary);
+            color: var(--white);
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .feature-card.secondary .feature-label {
+            background: var(--purple);
+        }
+
+        .feature-card h3 {
+            margin-top: 4px;
+            font-size: 18px;
+        }
+
+        /* Acceptance Criteria */
+        .ac-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .ac-item:last-child {
+            border-bottom: none;
+        }
+
+        .ac-check {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            border: 2px solid var(--green);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+        }
+
+        /* Scenario Cards */
+        .scenario {
+            background: var(--bg);
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin: 12px 0;
+            border-left: 3px solid var(--primary);
+        }
+
+        .scenario h4 {
+            color: var(--secondary);
+            text-transform: none;
+            letter-spacing: 0;
+            font-size: 15px;
+            margin-top: 0;
+        }
+
+        /* Tile Visualization */
+        .tile-demo {
+            display: flex;
+            gap: 6px;
+            margin: 16px 0;
+            align-items: center;
+        }
+
+        .tile {
+            width: 48px;
+            height: 32px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .tile.red { background: var(--red); }
+        .tile.yellow { background: var(--yellow); }
+        .tile.green { background: var(--green); }
+
+        .tile-label {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-left: 12px;
+        }
+
+        /* JTBD */
+        .jtbd {
+            background: var(--bg);
+            padding: 16px 20px;
+            border-radius: 6px;
+            margin: 12px 0;
+            font-style: italic;
+            font-size: 14px;
+            border-left: 3px solid var(--purple);
+        }
+
+        /* User Stories */
+        .user-story {
+            padding: 12px 16px;
+            margin: 8px 0;
+            background: var(--bg);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        /* Phases */
+        .phase-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .phase-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--bg);
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .phase-number {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            background: var(--primary);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .phase-item.active {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* Goals Grid */
+        .goals-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .goal-item {
+            padding: 12px 16px;
+            background: var(--bg);
+            border-radius: 6px;
+            font-size: 14px;
+            border-left: 3px solid var(--green);
+        }
+
+        .non-goal-item {
+            padding: 12px 16px;
+            background: var(--bg);
+            border-radius: 6px;
+            font-size: 14px;
+            border-left: 3px solid var(--red);
+            opacity: 0.7;
+        }
+
+        /* Risks */
+        .risk-item {
+            display: flex;
+            gap: 10px;
+            padding: 12px 0;
+            font-size: 14px;
+        }
+
+        .risk-icon {
+            font-size: 18px;
+        }
+
+        /* Footer */
+        .doc-footer {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-light);
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .goals-grid {
+                grid-template-columns: 1fr;
+            }
+            .doc-header {
+                padding: 32px 24px;
+            }
+            .doc-header h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="doc-header">
+            <h1>PRD: Monitoring Improvements for Zone Navigator</h1>
+            <p class="subtitle">SaaS Filter and Flow Health Tiles</p>
+            <div class="meta-badges">
+                <span class="badge">📋 Product Requirements Document</span>
+                <span class="badge">👥 Monitoring Operations</span>
+                <span class="badge">🏷️ Zone Navigator</span>
+            </div>
+        </div>
+
+        <!-- Priority -->
+        <div class="priority-banner">
+            <strong>Priority:</strong> 1) SaaS filter in Flows &nbsp;→&nbsp; 2) Flow health tiles<br>
+            <strong>Audience:</strong> Product, Engineering, Design, and Monitoring Operations teams.
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="section">
+            <h2>Executive Summary</h2>
+            <p>Monitoring teams use two Zone Navigator views: <strong>All Customer Services</strong> and <strong>Flows</strong>. Both help but have key gaps.</p>
+            <ul>
+                <li><strong>All Customer Services</strong> offers SaaS filtering and tile-based duration views but lacks clear flow-level health, especially when flows span multiple Customer Services.</li>
+                <li><strong>Flows</strong> shows detailed flow metrics and related Customer Services but lacks SaaS filtering and tile-based health history.</li>
+            </ul>
+            <p>The proposed solution adds:</p>
+            <ol>
+                <li><strong>Multi-select SaaS filter in Zone Navigator Flows</strong></li>
+                <li><strong>Flow health tiles in Zone Navigator Flows</strong></li>
+            </ol>
+            <p>Together, these let monitors filter Flows by SaaS and see flow health duration without drilling into Customer Services.</p>
+        </div>
+
+        <!-- Current Monitoring Workflow -->
+        <div class="section">
+            <h2>Current Monitoring Workflow</h2>
+            <p>Monitoring focuses on two Zone Navigator sections: <strong>All Customer Services</strong> and <strong>Flows</strong>. Monitors first check the last 30 minutes of health via 6 tiles (5 minutes each). Scope and severity rules apply after issue detection.</p>
+
+            <h3>How All Customer Services Is Used Today</h3>
+            <ul>
+                <li>Monitors filter to SaaS products they own or watch.</li>
+                <li>They filter further to unhealthy Customer Services.</li>
+                <li>The 6 tiles show how long a Customer Service has been unhealthy.</li>
+                <li>If tiles cross thresholds, they open the Customer Service to find failing flows.</li>
+            </ul>
+            <p><strong>What works well:</strong> SaaS filtering reduces noise; tile patterns help spot sustained unhealthy conditions.</p>
+
+            <h3>How Flows Is Used Today</h3>
+            <ul>
+                <li>Monitors use Flows to see unhealthy conditions at flow level.</li>
+                <li>Flows shows key metrics: availability, latency, success rate.</li>
+                <li>It shows which Customer Services use each flow and which are impacted.</li>
+                <li>Useful when one flow causes multiple Customer Services to be unhealthy.</li>
+            </ul>
+            <p><strong>What works well:</strong> Flows helps identify if one flow causes several unhealthy Customer Services.</p>
+        </div>
+
+        <!-- Problem Statement -->
+        <div class="section">
+            <h2>Problem Statement</h2>
+            <p>Monitors must switch views because no single view supports the full monitoring workflow efficiently.</p>
+
+            <h3>Problem 1: Flows Has No SaaS Filter</h3>
+            <ul>
+                <li>Manual and slow when zones have hundreds of Customer Services.</li>
+                <li>Saved filters risk incompleteness as Customer Services change under a SaaS.</li>
+                <li>Risk of missing flows that need monitoring.</li>
+                <li>Monitors focus on SaaS ownership, not just fixed Customer Service lists.</li>
+            </ul>
+            <p><em>This is the top priority gap.</em></p>
+
+            <h3>Problem 2: Flows Has No Health Tile Visualization</h3>
+            <ul>
+                <li>Can't instantly see if a flow has been unhealthy for 5, 10, 15, or 30 minutes.</li>
+                <li>Must dig deeper to estimate duration.</li>
+                <li>This slows decisions during active monitoring.</li>
+            </ul>
+
+            <h3>Problem 3: Customer Service Tiles Hide Per-Flow Timing</h3>
+            <p>Customer Service tiles aggregate multiple flows, masking flow-level differences and slowing decisions.</p>
+            <p><strong>Example:</strong></p>
+            <ul>
+                <li>Flow A in Customer Service ABC failed success rate for 30 minutes.</li>
+                <li>Flow B in same service unhealthy on availability for 15 minutes.</li>
+                <li>Customer Service tiles may show all 6 tiles red.</li>
+            </ul>
+            <p>Monitors can't tell which flow caused the issue first, which has been escalated, or which just crossed a threshold.</p>
+
+            <h3>Problem 4: Shared Flows Create Repeated Manual Checks</h3>
+            <ul>
+                <li>From All Customer Services view, monitors can't tell if issues share the same root cause flow.</li>
+                <li>Monitors must open multiple Customer Services to confirm repeatedly.</li>
+                <li>This adds effort and delays diagnosis.</li>
+            </ul>
+        </div>
+
+        <!-- Scale and Operational Impact -->
+        <div class="section">
+            <h2>Scale and Operational Impact</h2>
+            <p>The monitoring challenge is large due to scale.</p>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Zone</th>
+                            <th>SaaS Count</th>
+                            <th>Total Customer Services</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>OPTUM Strawberry</td>
+                            <td>15</td>
+                            <td>889</td>
+                        </tr>
+                        <tr>
+                            <td>US Zone</td>
+                            <td>7</td>
+                            <td>403</td>
+                        </tr>
+                        <tr>
+                            <td>AWS Common Prod</td>
+                            <td>5</td>
+                            <td>197</td>
+                        </tr>
+                        <tr>
+                            <td>OPTUM Cherry</td>
+                            <td>15</td>
+                            <td>761</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total</strong></td>
+                            <td><strong>42</strong></td>
+                            <td><strong>~2,250</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p><strong>Important risk:</strong> Customer Service membership under a SaaS changes. Manual Customer Service filters risk missing new services.</p>
+        </div>
+
+        <!-- Goals and Non-Goals -->
+        <div class="section">
+            <h2>Goals and Non-Goals</h2>
+            <h3>Goals</h3>
+            <div class="goals-grid">
+                <div class="goal-item">Enable monitors to filter Flows by one or more SaaS products.</div>
+                <div class="goal-item">Ensure Flows auto-updates with Customer Service changes under SaaS.</div>
+                <div class="goal-item">Provide tile-based health history for flows matching Customer Service mental model.</div>
+                <div class="goal-item">Reduce repeated drill-downs for shared-flow issues.</div>
+                <div class="goal-item">Speed up and boost confidence in manual monitoring.</div>
+            </div>
+            <h3>Non-Goals</h3>
+            <div class="goals-grid">
+                <div class="non-goal-item">No new alerting or notification behavior.</div>
+                <div class="non-goal-item">No changes to escalation policy logic.</div>
+                <div class="non-goal-item">No new save-filter features; current behavior is sufficient.</div>
+            </div>
+        </div>
+
+        <!-- Feature 1 -->
+        <div class="section">
+            <h2>Proposed Requirements</h2>
+
+            <div class="feature-card">
+                <span class="feature-label">Highest Priority</span>
+                <h3>Feature 1: Multi-Select SaaS Filter in Zone Navigator Flows</h3>
+                <p>Add a SaaS filter on the Flows page so monitors can select multiple SaaS products and view flows linked to Customer Services under those SaaS.</p>
+
+                <h4>User Value</h4>
+                <ul>
+                    <li>Avoids manually selecting many Customer Services.</li>
+                    <li>Matches filtering to actual monitoring ownership.</li>
+                    <li>Automatically includes new Customer Services under chosen SaaS.</li>
+                    <li>Lowers risk of monitoring gaps.</li>
+                </ul>
+
+                <h4>Functional Requirements</h4>
+                <ul>
+                    <li>Flows page must filter by <strong>one or more SaaS products</strong>.</li>
+                    <li>Filter must work with existing filters like unhealthy status and others.</li>
+                    <li>Selecting a SaaS shows flows of Customer Services mapped to it.</li>
+                    <li>Changes in Customer Services under a SaaS update filter results automatically.</li>
+                    <li>Feature must support existing saved-filter capability.</li>
+                </ul>
+
+                <h4>Expected Outcome</h4>
+                <p>Monitors select SaaS products and instantly see relevant flows without managing static Customer Service lists.</p>
+            </div>
+
+            <div class="feature-card secondary">
+                <span class="feature-label">Secondary Priority</span>
+                <h3>Feature 2: Flow Health Tiles in Zone Navigator Flows</h3>
+                <p>Add the same 6-tile health pattern from Customer Services to each flow in the Flows view.</p>
+
+                <h4>User Value</h4>
+                <ul>
+                    <li>Shows unhealthy duration per flow instantly.</li>
+                    <li>Aligns monitoring views between Customer Services and Flows.</li>
+                    <li>Helps spot long-term vs new issues.</li>
+                    <li>Reduces opening multiple Customer Services to check timing.</li>
+                </ul>
+
+                <h4>Functional Requirements</h4>
+                <ul>
+                    <li>Each flow shows <strong>6 health tiles</strong> for the <strong>last 30 minutes</strong>.</li>
+                    <li>Each tile covers a <strong>5-minute interval</strong>.</li>
+                    <li>MVP uses a <strong>single combined tile series</strong> per flow.</li>
+                    <li>Tile color reflects <strong>SLO breach status</strong> across metrics.</li>
+                </ul>
+
+                <h4>Combined Tile Logic (MVP)</h4>
+                <div class="tile-demo">
+                    <div class="tile red">RED</div>
+                    <div class="tile red">RED</div>
+                    <div class="tile red">RED</div>
+                    <div class="tile yellow">WARN</div>
+                    <div class="tile green">OK</div>
+                    <div class="tile green">OK</div>
+                    <span class="tile-label">← 30 min ago &nbsp;&nbsp;&nbsp; now →</span>
+                </div>
+                <ul>
+                    <li>If any metric is <strong>red</strong> in a 5-minute slot → tile is red.</li>
+                    <li>If no red but some <strong>warn</strong> metrics → tile is warn/yellow.</li>
+                    <li>If all metrics healthy → tile is green.</li>
+                </ul>
+
+                <h4>Preferred Enhancement After MVP</h4>
+                <p>Add separate tile rows by metric: Availability, Latency, Success Rate. Combined tiles are fine for first version, but metric-wise tiles offer better diagnostics.</p>
+            </div>
+        </div>
+
+        <!-- Jobs to Be Done -->
+        <div class="section">
+            <h2>Jobs to Be Done</h2>
+            <div class="jtbd">
+                <strong>When</strong> I open Flows for active monitoring, <strong>I want</strong> to filter by SaaS instead of manually curating Customer Services, <strong>so that</strong> I only see flows relevant to my scope and do not miss newly added Customer Services.
+            </div>
+            <div class="jtbd">
+                <strong>When</strong> I see a flow issue, <strong>I want</strong> to understand how long it has been unhealthy from the Flows page itself, <strong>so that</strong> I can act faster without repeated drill-downs.
+            </div>
+            <div class="jtbd">
+                <strong>When</strong> multiple Customer Services become unhealthy together, <strong>I want</strong> to see whether one shared flow is the common cause, <strong>so that</strong> I can diagnose once instead of checking each Customer Service individually.
+            </div>
+        </div>
+
+        <!-- User Stories -->
+        <div class="section">
+            <h2>User Stories</h2>
+
+            <h3>Feature 1: Multi-Select SaaS Filter</h3>
+            <div class="user-story">As a <strong>monitoring operator</strong>, I want to filter Flows by one or more SaaS products, so I see only flows relevant to my scope without manually selecting Customer Services.</div>
+            <div class="user-story">As a <strong>monitoring operator</strong>, I want the SaaS filter to auto-include Customer Services mapped under selected SaaS, so new Customer Services aren't missed.</div>
+            <div class="user-story">As a <strong>monitoring operator</strong>, I want the SaaS filter to work with existing filters like health status and saved filters, so I can maintain my workflow with less manual effort.</div>
+            <div class="user-story">As a <strong>monitoring lead</strong>, I want monitors to filter by ownership scope instead of static CS lists, so operational coverage stays accurate when CS mappings change.</div>
+
+            <h3>Feature 2: Flow Health Tiles</h3>
+            <div class="user-story">As a <strong>monitoring operator</strong>, I want each flow to show 6 health tiles for the last 30 minutes, so I quickly know how long a flow has been unhealthy.</div>
+            <div class="user-story">As a <strong>monitoring operator</strong>, I want flow tiles to use 5-minute intervals like Customer Service tiles, so I can apply the same monitoring model across views.</div>
+            <div class="user-story">As a <strong>monitoring operator</strong>, I want the combined flow tile to show the worst SLO state across availability, latency, and success rate, so I can spot unhealthy flows without opening each Customer Service.</div>
+            <div class="user-story">As a <strong>monitoring operator</strong>, I want metric-wise tiles for availability, latency, and success rate if possible, so I can see which metric causes unhealthiness.</div>
+        </div>
+
+        <!-- Acceptance Criteria -->
+        <div class="section">
+            <h2>Acceptance Criteria</h2>
+
+            <h3>Feature 1: Multi-Select SaaS Filter</h3>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given I am on Zone Navigator Flows, when I open filters, then I see a SaaS filter option.</div></div>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given multiple SaaS products exist, when I use the SaaS filter, then I can select one or more SaaS.</div></div>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given I select one SaaS, when Flows load, then it shows flows linked to Customer Services under that SaaS.</div></div>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given multiple SaaS selected, when Flows load, then it shows flows linked to Customer Services under any selected SaaS.</div></div>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given SaaS filter with unhealthy status, when results show, then only unhealthy flows in selected SaaS appear.</div></div>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given a new Customer Service added under selected SaaS, when Flows reload, then flows from it appear automatically.</div></div>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given a Customer Service is removed from selected SaaS, when Flows reload, then flows from it no longer appear.</div></div>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given a saved filter with SaaS selected, when reopened, then SaaS selections restore and apply with other filters.</div></div>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given selected SaaS have no matching flows, when results show, then existing empty state applies.</div></div>
+
+            <h3>Feature 2: Flow Health Tiles</h3>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given I view Flows and health data exists, then each flow shows 6 health tiles for last 30 minutes.</div></div>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given flow has health data for 30 minutes, when tiles render, then each tile covers one 5-minute interval.</div></div>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given any metric breaches red SLO in 5-minute interval, then combined tile is red.</div></div>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given no red but warn status in interval, then combined tile is warn.</div></div>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given all metrics healthy in interval, then combined tile is green.</div></div>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given a flow unhealthy for 15 minutes, when I view Flows, then tile pattern shows 3 consecutive unhealthy intervals.</div></div>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given one flow unhealthy 30 minutes and another 15 minutes ago in same CS, then flow tiles show separate durations.</div></div>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given metric-wise tiles added later, when viewing a flow, then separate rows show availability, latency, and success rate.</div></div>
+            <div class="ac-item"><div class="ac-check">✓</div><div>Given flow health tiles shown, when compared to Customer Service tiles, then visual pattern and timing model are consistent.</div></div>
+        </div>
+
+        <!-- Key Scenarios -->
+        <div class="section">
+            <h2>Key Scenarios</h2>
+            <div class="scenario">
+                <h4>Scenario 1: Prevent Missing Newly Added Customer Services</h4>
+                <p>A monitor saves a Flows view for coverage. Later, a new Customer Service is added under an existing SaaS. With Customer Service filtering, it might be missed. With SaaS filtering, it appears automatically.</p>
+            </div>
+            <div class="scenario">
+                <h4>Scenario 2: Shared Flow Impacts Many Customer Services</h4>
+                <p>A flow reused in several Customer Services becomes unhealthy. Many appear unhealthy, but the monitor can see the common flow once and identify all impacted Services immediately.</p>
+            </div>
+            <div class="scenario">
+                <h4>Scenario 3: Different Flows Fail at Different Times</h4>
+                <p>One flow fails for 30 minutes, another starts failing after 15 minutes. Customer Service tiles can't show this clearly. Flow tiles show exact timing per flow.</p>
+            </div>
+            <div class="scenario">
+                <h4>Scenario 4: Success Rate Issue Hidden in Aggregation</h4>
+                <p>A flow fails on success rate while the Customer Service shows aggregated unhealthiness. Flow-level view reveals exact metric and timing without relying on summary health.</p>
+            </div>
+        </div>
+
+        <!-- Design & UX -->
+        <div class="section">
+            <h2>Design and UX Considerations</h2>
+            <ul>
+                <li>The SaaS filter should behave consistently with existing filter patterns in Zone Navigator.</li>
+                <li>Multi-select behavior is required.</li>
+                <li>Saved filters should continue to work with the new SaaS filter dimension.</li>
+                <li>Empty results can continue using current blank-state behavior.</li>
+                <li>Flow health tiles should be visually consistent with existing Customer Service health tiles to reuse the current monitoring mental model.</li>
+            </ul>
+        </div>
+
+        <!-- Dependencies -->
+        <div class="section">
+            <h2>Dependencies and Assumptions</h2>
+            <ul>
+                <li>The system already knows the mapping between SaaS and Customer Services.</li>
+                <li>The system already computes the health signals needed for flow metrics (availability, latency, success rate).</li>
+                <li>Saved filter capability already exists and does not need redesign.</li>
+            </ul>
+        </div>
+
+        <!-- Risks -->
+        <div class="section">
+            <h2>Risks and Open Considerations</h2>
+            <div class="risk-item"><span class="risk-icon">⚠️</span><span>Combined tiles simplify the view, but may still hide which metric specifically caused the unhealthy state.</span></div>
+            <div class="risk-item"><span class="risk-icon">⚠️</span><span>If engineering effort is manageable, metric-wise tiles may deliver better operational value than combined tiles alone.</span></div>
+            <div class="risk-item"><span class="risk-icon">⚠️</span><span>Performance should be reviewed if SaaS filtering significantly expands or changes how flow result sets are computed.</span></div>
+        </div>
+
+        <!-- Success Metrics -->
+        <div class="section">
+            <h2>Success Metrics</h2>
+            <ul>
+                <li>Reduction in time spent manually selecting or maintaining Customer Service filters in Flows.</li>
+                <li>Reduction in repeated drill-downs across multiple Customer Services for shared-flow incidents.</li>
+                <li>Improved operator confidence that all in-scope Customer Services under selected SaaS are covered.</li>
+                <li>Faster time to understand whether a flow issue is newly emerging or long-running.</li>
+            </ul>
+        </div>
+
+        <!-- Delivery Approach -->
+        <div class="section">
+            <h2>Recommended Delivery Approach</h2>
+            <div class="phase-list">
+                <div class="phase-item active">
+                    <div class="phase-number">1</div>
+                    <div>
+                        <strong>Phase 1:</strong> Add multi-select SaaS filter in Flows<br>
+                        <small style="color: var(--text-light);">Addresses the biggest operational risk and removes manual maintenance.</small>
+                    </div>
+                </div>
+                <div class="phase-item">
+                    <div class="phase-number">2</div>
+                    <div>
+                        <strong>Phase 2:</strong> Add combined flow health tiles<br>
+                        <small style="color: var(--text-light);">Completes the monitoring workflow at flow level.</small>
+                    </div>
+                </div>
+                <div class="phase-item">
+                    <div class="phase-number">3</div>
+                    <div>
+                        <strong>Phase 3:</strong> Evaluate metric-wise flow tiles if feasible<br>
+                        <small style="color: var(--text-light);">Better diagnostics with per-metric breakdown.</small>
+                    </div>
+                </div>
+            </div>
+            <p><strong>Recommendation:</strong> Deliver the SaaS filter first. It addresses the biggest operational risk and removes a major source of manual maintenance. Flow health tiles should follow to complete the monitoring workflow at flow level.</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="doc-footer">
+            PRD: Monitoring Improvements for Zone Navigator – SaaS Filter and Flow Health Tiles
+        </div>
+    </div>
+</body>
+</html>
